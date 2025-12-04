@@ -13,11 +13,11 @@ referredBy:string;
    @Prop()
 referralCode:string;
    @Prop()
-amount:string;
+amount:number;
    @Prop()
-totalEarned:string;
+totalEarned:number;
    @Prop()
-totalreferres:string;
+totalreferred:number;
 
 }
 export const userSchema=SchemaFactory.createForClass(User);

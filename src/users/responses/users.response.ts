@@ -1,9 +1,14 @@
 export class UserProfileResponse{
+  id:string;
+  fullname:string;
   username: string;
+
   referralCode: string;
   referredBy?: string;
-  balance: number;
+  amount: number;
   totalEarned: number;
   totalReferred: number;
-  createdAt: Date;
+
+  
+  
 }   
