@@ -1,4 +1,5 @@
 import { IsOptional, IsString, IsEmail, MinLength } from "class-validator";
+import { isObject } from "node:util";
 
 export class RegisterUserDto {
     @IsString()
@@ -15,24 +16,26 @@ export class RegisterUserDto {
     @IsString()
     refferedBy?: string;  
 }
-export class LoginUserDto {
+
+export class UpdateUserDto {
     @IsString()
-    username: string;        
+    
+    fullname: string;
     
     @IsString()
-    password: string;        
-}
-export class UpdateUserDto {
+    username: string;       
+    
+    @IsString()
+    @MinLength(6)           
+    password: string;
+    
     @IsOptional()
     @IsString()
-    fullname?: string;      
-    
- @IsOptional()
-    @IsString()
-    @MinLength(6)
-    password?: string;         
+    refferedBy?: string;  
+}
+
+         
        
    
 
       
-}
