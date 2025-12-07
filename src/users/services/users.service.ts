@@ -127,7 +127,7 @@ async getAllUsers():Promise<UserProfileResponse[]>{
     username:user.username,
     referralCode:user.referralCode,
     referredBy:user.referredBy,
-    amount:user.amount,
+    amount:user.amount, 
     totalEarned:user.totalEarned,
     totalReferred:user.totalEarned
   }))
