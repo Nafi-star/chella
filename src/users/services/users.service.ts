@@ -1,11 +1,12 @@
 import { Injectable, BadRequestException, NotFoundException, NotAcceptableException } from '@nestjs/common';
-import { RegisterUserDto,  UpdateUserDto } from '../dto/users.dto';
+import { RegisterUserDto,  UpdateUserDto,UserLoginDto} from '../dto/users.dto';
 import { UserProfileResponse } from '../responses/users.response';
 import { User } from '../schemas/users.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import * as bcrypt from 'bcrypt';
 import { CommonUtils } from '../commons/utils';
+import { access } from 'fs';
 
 
 @Injectable()
@@ -120,7 +121,9 @@ return userProfile
 }
 async getAllUsers():Promise<UserProfileResponse[]>{
   const users =await this.userModel.find();
-
+if(!users||users.length===0){
+  return[];
+}
   const usersResponse:UserProfileResponse[] = users.map(user=>({
     id:user._id.toString(),
     fullname :user.fullname,
@@ -137,12 +140,31 @@ return usersResponse
 
 }
 
- 
+//2 AUTH SERVICE
    
+   async userLogin (userLoginDto:UserLoginDto){
+  const  user =await this.userModel .findOne({
+    username:userLoginDto.username.toLowerCase(),
+  });
+  if(!user){
+    throw new BadRequestException("Invalid user name");
+  }
+  const isPwdMatch=await bcrypt.compare(userLoginDto.password ,user.password);
+  if(!isPwdMatch){
+    throw new BadRequestException("incorrect password")
+  }
+const jwtData={
+  id:user._id.toString(),
+  fullname:user.fullname,
+  usename:user.username
+}
+const generateToken=CommonUtils.generateJwtToken(jwtData)
+console.log("GENERATED TOKEN,generatedToken")
+return{
+  accessToken:generateToken,
+}
+  
+}
     
-
-  
-
-  
 
 }

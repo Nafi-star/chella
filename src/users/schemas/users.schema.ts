@@ -7,6 +7,8 @@ import { Document } from "mongoose";
    @Prop()
 fullname:string;
    @Prop()
+password:string;
+   @Prop()
 username:string;
    @Prop()
 referredBy:string;

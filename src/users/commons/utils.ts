@@ -1,3 +1,4 @@
+import * as jwt from 'jsonwebtoken';
 export class CommonUtils {
     static generateReferralCode(length = 6): string {
         const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
@@ -5,7 +6,14 @@ export class CommonUtils {
         for (let i = 0; i < length; i++) {
             code += chars.charAt(Math.floor(Math.random() * chars.length));
         }
-        return code.toLocaleUpperCase();
+        return code.toUpperCase();
+    }
+    //jwt
+    static generateJwtToken(jwtData){
+        const generateJwtToken = jwt.sign(jwtData, process.env.JWT_SECRET!, {
+            expiresIn: '10m'
+        });
+        return generateJwtToken;
     }
 
 

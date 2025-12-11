@@ -1,8 +1,9 @@
 import { Controller, Post, Patch, Get, Body, HttpCode, HttpStatus, Request, Param } from '@nestjs/common';
 import { UsersService } from '../services/users.service';
-import { RegisterUserDto, UpdateUserDto } from '../dto/users.dto';
+import { RegisterUserDto, UpdateUserDto,UserLoginDto } from '../dto/users.dto';
 import { UserProfileResponse } from '../responses/users.response';
-
+import { Jwt } from 'jsonwebtoken';
+import { JwtAuthGuard } from '../commons/guards/jwt.auth.guard';
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
@@ -27,13 +28,12 @@ async getUserProfile(
   const result =await this.usersService.getUserprofile(id)
   return result
 }
-  
-@Get('all')
-async getAllUsers(){
-  const result = await this.usersService.getAllUsers()
-  return result
-}
 
+@Post('login')
+async userLogin(@Body()userLoginDto:UserLoginDto){
+  const result=await this.usersService.userLogin(userLoginDto);
+  return result;
+}
 
 
   

@@ -9,12 +9,16 @@ import { TransactionsModule } from './transactions/transactions.module';
 import { ExchangeRatesModule } from './exchange-rates/exchange-rates.module';
 import { ReferralsModule } from './referrals/referrals.module';
 import { MongooseModule } from '@nestjs/mongoose';
-
+import { JwtStrategy } from './users/commons/guards/jwt.strategy';
+import { ConfigModule } from '@nestjs/config';
 @Module({
 
   imports:
 [
-  MongooseModule.forRoot("mongodb+srv://naifewande_db_user:WUJWhiRFMu5XC8Xn@chella.uvmzwfs.mongodb.net/?appName=chella"),
+  ConfigModule.forRoot({
+    isGlobal:true,
+  }),
+  MongooseModule.forRoot(process.env.MONGO_URI||""),
 
   
  UsersModule, TasksModule, TransactionsModule, ExchangeRatesModule, ReferralsModule],
