@@ -11,6 +11,7 @@ import { ReferralsModule } from './referrals/referrals.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { JwtStrategy } from './users/commons/guards/jwt.strategy';
 import { ConfigModule } from '@nestjs/config';
+import { PassportModule } from '@nestjs/passport';
 @Module({
 
   imports:
@@ -19,10 +20,11 @@ import { ConfigModule } from '@nestjs/config';
     isGlobal:true,
   }),
   MongooseModule.forRoot(process.env.MONGO_URI||""),
+  PassportModule,
 
   
  UsersModule, TasksModule, TransactionsModule, ExchangeRatesModule, ReferralsModule],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, JwtStrategy],
 })
 export class AppModule {}

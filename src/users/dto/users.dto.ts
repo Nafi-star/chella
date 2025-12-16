@@ -14,7 +14,7 @@ export class RegisterUserDto {
     
     @IsOptional()
     @IsString()
-    refferedBy?: string;  
+    referredBy?: string;  
 }
 
 export class UpdateUserDto {

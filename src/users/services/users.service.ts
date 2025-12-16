@@ -7,13 +7,16 @@ import { Model } from 'mongoose';
 import * as bcrypt from 'bcrypt';
 import { CommonUtils } from '../commons/utils';
 import { access } from 'fs';
+import { Referral } from 'src/referrals/schemas/referrals.schema';
+import { ReferralService } from 'src/referrals/services/refferals.service';
 
 
 @Injectable()
 export class UsersService {
    constructor(@InjectModel(User.name)
-   private readonly userModel:Model<User>){}
- 
+   private readonly userModel:Model<User>,
+   private readonly referralService:ReferralService
+ ){}
  async registerUser(registerDto: RegisterUserDto){
   console.log("coming requesr") 
   const existingUser=await this.userModel.findOne({
@@ -23,39 +26,40 @@ export class UsersService {
   if(existingUser){
     throw new BadRequestException("username already existing");
   }
+  let referringUser=null as any;
+          if (registerDto.referredBy) {
+            referringUser = await this.userModel.findOne({ referralCode: registerDto.referredBy});
+
+            if (!referringUser) {
+                throw new BadRequestException('Invalid referral code.');
+            }
+        }
+
   const hashedPwd= await bcrypt.hash(registerDto.password,10);
   const refferalCode= CommonUtils.generateReferralCode();
-  
-  if (registerDto.refferedBy){
-    const refferingUser = await this.userModel.findOne({
-      referralCode:registerDto.refferedBy
-    });
-    if(refferingUser){
-      await this.userModel.findByIdAndUpdate(
-        refferingUser._id,{
-          totalEarned:refferingUser.totalEarned + 20,
-          amount:refferingUser.amount +20,
-          totalreferred:refferingUser.totalreferred
-        }
-        
-      );
 
-    }
-
-  
-  }
   const newUser =new this.userModel({
     fullname:registerDto.fullname,
     username:registerDto.fullname,
     password:hashedPwd,
     referralCode:refferalCode,
-    referredBy:registerDto.refferedBy || null,
+    referredBy:registerDto.referredBy || null,
     amount:100,
     totalEarned:100,
     totalReferred:0
   
   })
   const savedUser =await newUser.save();
+  if(referringUser){
+        await this.referralService.createReferralTracking(
+        referringUser._id.toString(),
+        savedUser._id.toString());
+        await this.userModel.findByIdAndUpdate(referringUser._id, {
+          totalEarned: referringUser.totalEarned + 20,
+          amount: referringUser.amount + 20,
+          totalReffered: referringUser.totalReffered + 1
+      });
+        }
   const userProfileResponse:UserProfileResponse ={
     id:savedUser._id.toString(),
     fullname :savedUser.fullname,
@@ -163,8 +167,16 @@ console.log("GENERATED TOKEN,generatedToken")
 return{
   accessToken:generateToken,
 }
-  
 }
-    
+   async getMyreferralCode (currentUser){
+  const  user =await this.userModel .findById(currentUser._id);
+  if(!user){
+    throw new BadRequestException("user does not exist");
+  }
+   const userResponse:UserProfileResponse={
+    referralCode:user.referralCode,
+   }
 
-}
+   return userResponse
+   }
+  }
